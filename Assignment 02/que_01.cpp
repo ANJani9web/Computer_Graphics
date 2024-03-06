@@ -90,3 +90,25 @@ int main(int argc, char *argv[])
 
     return 0; // Return 0 to exit main function
 }
+
+// void Initial() {
+//     glClearColor(1.0, 1.0, 1.0, 0);
+//     glColor3f(1,0,1);
+//     glPointSize(7.0);
+//     glMatrixMode(GL_PROJECTION);
+//     glLoadIdentity();
+//     gluOrtho2D(0, 100, 0, 100);
+// }
+
+// int main(int C, char *V[]){
+//     glutInit(&C,V);
+//     glutInitDisplayMode(GLUT_RGB  | GLUT_SINGLE);
+//     glutInitWindowSize(600,600);
+//     glutInitWindowPosition(0,0);
+
+//     glutCreateWindow("DDA Line Drawing");
+//     Initial();
+//     glutDisplayFunc(Draw);
+//     glutMainLoop();
+//     return 0;
+// }

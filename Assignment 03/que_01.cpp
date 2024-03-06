@@ -1,274 +1,144 @@
-// // // draw a line joining two end points given by the user by implementing DDA(digital differential Analyzer)
-// // // do not declare the points as global variables and do not use built in functions for drawing the line
-// // // use the following algorithm
-// // // 1. input the two end points of the line
-// // // 2. calculate dx and dy
-// // // 3. calculate steps
-// // // 4. calculate xincrement and yincrement
-// // // 5. put pixel (x,y)
-// // // 6. repeat steps 5 and 6 until x=x2 and y=y2
-// // // 7. end
-
-// // #include <iostream>
-// // #include <cmath>
-// // #include <GL/glut.h>
-
-// // using namespace std;
-
-// // // Structure to hold a point (x, y)
-// // struct Point {
-// //     int x;
-// //     int y;
-// // };
-
-// // // Function to draw a line using DDA algorithm
-// // void drawLine(Point p1, Point p2) {
-// //     // Calculate the differences between endpoints
-// //     int dx = p2.x - p1.x;
-// //     int dy = p2.y - p1.y;
-
-// //     // Calculate steps required for generating pixels
-// //     int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
-
-// //     if(dy>dx){
-// //         steps = abs(dy);
-// //         float xInc = dx / (float) steps;
-// //         float yInc = 1;
-// //         // Initialize starting point
-
-
-// //     }
-// //     float xInc = dx / (float) steps;
-// //     float yInc = dy / (float) steps;
-
-// //     // Initialize starting point
-// //     float x = p1.x;
-// //     float y = p1.y;
-
-// //     // Begin drawing line
-// //     glBegin(GL_POINTS);
-
-// //     // Iterate over all the steps
-// //     for (int i = 0; i <= steps; i++) {
-// //         // Plot the point (x, y)
-// //         glVertex2i(round(x), round(y));
-        
-// //         // Increment in x and y for the next step
-// //         x += xInc;
-// //         y += yInc;
-// //     }
-
-// //     glEnd();
-// //     glFlush();
-// // }
-
-// // // Function to handle drawing
-// // void display() {
-// //     Point p1, p2;
-
-// //     // Input two endpoints
-// //     cout << "Enter endpoint 1 (x1, y1): ";
-// //     cin >> p1.x >> p1.y;
-
-// //     cout << "Enter endpoint 2 (x2, y2): ";
-// //     cin >> p2.x >> p2.y;
-
-// //     // Set the color of the line to red
-// //     glColor3f(1.0, 0.0, 0.0);
-
-// //     // Draw the line
-// //     drawLine(p1, p2);
-// // }
-
-// // int main(int argc, char** argv) {
-// //     // Initialize GLUT
-// //     glutInit(&argc, argv);
-
-// //     // Set display mode
-// //     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-
-// //     // Set window size and position
-// //     glutInitWindowSize(500, 500);
-// //     glutInitWindowPosition(100, 100);
-
-// //     // Create window with a title
-// //     glutCreateWindow("DDA Line Drawing");
-
-// //     // Set the display function
-// //     glutDisplayFunc(display);
-
-// //     // Set the color for clearing the window
-// //     glClearColor(1.0, 1.0, 1.0, 0.0);
-
-// //     // Set the viewport
-// //     glMatrixMode(GL_PROJECTION);
-// //     glLoadIdentity();
-// //     gluOrtho2D(0, 100, 0, 100);
-
-// //     // Start the main loop
-// //     glutMainLoop();
-
-// //     return 0;
-// // }
-
-
-// #include <GL/glut.h>
-// #include<GL/glu.h>
-// #include<bits/stdc++.h>
-// using namespace std;
-
-
-// void Draw() 
-// {
-//     int x1, y1, x2, y2; //starting and ending points of lines
-//     x1 = 100;
-//     y1 = 100;
-//     x2 = 750;
-//     y2 = 200;
-//     // adjust the values to draw the diagram
-
-//     glClear(GL_COLOR_BUFFER_BIT); 
-
-// 	glPointSize(3);
-
-//     // calculating dx, dy
-//     int dx = x2-x1, dy = y2-y1;      
-
-//     //for steps in ddl we take max steps possible direction
-//     // means if dx is > dy we take dx steps
-//     // otherwise we take dy steps
-//     int steps = max(abs(dx), abs(dy));
-//     //abs is absolute diff function and max is max of both
-
-//     float m = (float)(dy)/(float)(dx);
-
-//     //in dda algorithm we decide next point based on slope
-//     //if |m| < 1 x -> x + 1 and y -> y + m
-//     //if |m| > 1 x -> x + 1/m and y -> y + 1
-
-//     //for writing programme we can obsorve 
-//     //if dx > dy it means |m|<1 i.e steps = dx , x -> x + 1 == x -> x + dx/steps
-//     //      y -> y + m == y -> y + (dy/dx) == y -> y + (dy/steps)
-//     //if dx < dy it means |m|>1 i.e steps = dy , y -> y + 1 == y -> y + dy/steps (steps is max with dy,dx i.e., is dy)
-//     //      x -> x + 1/m == x -> x + (dx/dy) == x -> x + (dx/steps)
-
-//     //in total x -> x + (dx/steps) and y -> y + (dy/steps) will work for all cases
-
-//     float Xinc = (float)(dx) / (float)(steps), Yinc = (float)(dy) / (float)(steps); 
-//     // cout<<Xinc<<" "<<Yinc<<"\n";
-//     float X = x1, Y = y1;
-//     for(int i=0;i<=steps;i++)
-//     {
-//         glBegin(GL_POINTS);
-//             glColor3f(1, 0, 0);
-//             glVertex2f(round(X),round(Y)); //round function will make round of to near integers
-//         glEnd();
-//         // cout<<X<<" "<<Y<<"\n";
-//         X = X + Xinc;
-//         Y = Y + Yinc;
-//     }
-//     glFlush();
-// }
-
-// void Initial() {
-//     glClearColor(1.0, 1.0, 1.0, 0);
-//     glColor3f(1,0,1);
-//     glPointSize(7.0);
-//     glMatrixMode(GL_PROJECTION);
-//     glLoadIdentity();
-//     gluOrtho2D(0, 800, 0, 800);
-// }
-
-// int main(int C, char *V[]){
-//     glutInit(&C,V);
-//     glutInitDisplayMode(GLUT_RGB  | GLUT_SINGLE);
-//     glutInitWindowSize(600,600);
-//     glutInitWindowPosition(0,0);
-
-//     glutCreateWindow("DDL Line Drawing");
-//     Initial();
-//     glutDisplayFunc(Draw);
-//     glutMainLoop();
-//     return 0;
-// }
-
-
 #include <GL/glut.h>
-#include<GL/glu.h>
 #include<bits/stdc++.h>
+#include <iostream>
+#include <math.h>
+#include <vector>
+
 using namespace std;
 
+// Global variables to store coordinates
+float x1_coor, y1_coor, x2_coor, y2_coor;
 
-void Draw() 
-{
-    int x1, y1, x2, y2; //starting and ending points of lines
-    x1 = 30;
-    y1 = 40;
-    x2 = 70;
-    y2 = 70;
-    // adjust the values to draw the diagram
+// Vectors to store calculated coordinates
+vector<float> x_coor, y_coor;
 
-    glClear(GL_COLOR_BUFFER_BIT); 
+// Function to handle lines with slope greater than one
+void slope_greater_than_one(int steps) {
+    x_coor.push_back(x1_coor);
+    y_coor.push_back(y1_coor);
 
-	glPointSize(3);
-
-    // calculating dx, dy
-    int dx = x2-x1, dy = y2-y1;      
-
-    //for steps in ddl we take max steps possible direction
-    // means if dx is > dy we take dx steps
-    // otherwise we take dy steps
-    int steps = max(abs(dx), abs(dy));
-    //abs is absolute diff function and max is max of both
-
-    float m = (float)(dy)/(float)(dx);
-
-    //in dda algorithm we decide next point based on slope
-    //if |m| < 1 x -> x + 1 and y -> y + m
-    //if |m| > 1 x -> x + 1/m and y -> y + 1
-
-    //for writing programme we can obsorve 
-    //if dx > dy it means |m|<1 i.e steps = dx , x -> x + 1 == x -> x + dx/steps
-    //      y -> y + m == y -> y + (dy/dx) == y -> y + (dy/steps)
-    //if dx < dy it means |m|>1 i.e steps = dy , y -> y + 1 == y -> y + dy/steps (steps is max with dy,dx i.e., is dy)
-    //      x -> x + 1/m == x -> x + (dx/dy) == x -> x + (dx/steps)
-
-    //in total x -> x + (dx/steps) and y -> y + (dy/steps) will work for all cases
-
-    float Xinc = (float)(dx) / (float)(steps), Yinc = (float)(dy) / (float)(steps); 
-    // cout<<Xinc<<" "<<Yinc<<"\n";
-    float X = x1, Y = y1;
-    for(int i=0;i<=steps;i++)
-    {
-        glBegin(GL_POINTS);
-            glColor3f(1, 0, 0);
-            glVertex2f(round(X),round(Y)); //round function will make round of to near integers
-        glEnd();
-        // cout<<X<<" "<<Y<<"\n";
-        X = X + Xinc;
-        Y = Y + Yinc;
+    float curr_x = x1_coor, curr_y = y1_coor;
+    for (int i = 1; i <= steps; i++) {
+        curr_y++;
+        curr_x = curr_x + float((x2_coor - x1_coor) / (y2_coor - y1_coor));
+        x_coor.push_back(round(curr_x));
+        y_coor.push_back(curr_y);
     }
+
+    // Plot the calculated points
+    for (int i = 0; i < x_coor.size(); i++) {
+        glBegin(GL_POINTS);
+        glVertex2f(x_coor[i], y_coor[i]);
+        glEnd();
+    }
+}
+
+// Function to handle lines with slope less than one
+void slope_less_than_one(int steps) {
+    x_coor.push_back(x1_coor);
+    y_coor.push_back(y1_coor);
+    
+    //storing the points
+    float curr_x = x1_coor, curr_y = y1_coor;
+    for (int i = 1; i <= steps; i++) {
+        curr_x++;
+        curr_y = curr_y + float((y2_coor - y1_coor) / (x2_coor - x1_coor));
+        x_coor.push_back(round(curr_x));
+        y_coor.push_back(round(curr_y));
+    }
+
+    // Plot the calculated points
+    for (int i = 0; i < x_coor.size(); i++) {
+        glBegin(GL_POINTS);
+        glVertex2f(x_coor[i], y_coor[i]);
+        glEnd();
+    }
+}
+
+// Function to handle lines with slope equal to one
+void slope_equal_to_one(int steps) {
+    x_coor.push_back(x1_coor);
+    y_coor.push_back(y1_coor);
+
+    float curr_x = x1_coor, curr_y = y1_coor;
+    for (int i = 1; i <= steps; i++) {
+        curr_y++;
+        curr_x++;
+        x_coor.push_back(curr_x);
+        y_coor.push_back(curr_y);
+    }
+
+    // Plot the calculated points
+    for (int i = 0; i < x_coor.size(); i++) {
+        glBegin(GL_POINTS);
+        glVertex2f(x_coor[i], y_coor[i]);
+        glEnd();
+    }
+}
+
+// Display callback function
+void displayCB() {
+    // Ensure the starting point is on the left
+    if (x1_coor > x2_coor) {
+        swap(x1_coor, x2_coor);
+        swap(y1_coor, y2_coor);
+    }
+
+    // Calculate the differences in x and y coordinates
+    int dx = x2_coor - x1_coor;
+    int dy = y2_coor - y1_coor;
+
+    // Determine the number of steps
+    int steps = max(abs(dx), abs(dy));
+
+    // Determine the slope type and call the appropriate function
+    if (abs(dy) > abs(dx)) {
+        // Slope greater than one
+        slope_greater_than_one(steps);
+    } else if (abs(dy) < abs(dx)) {
+        // Slope less than one
+        slope_less_than_one(steps);
+    } else {
+        // Slope equal to one
+        slope_equal_to_one(steps);
+    }
+
+    // Flush the drawing commands
     glFlush();
 }
 
-void Initial() {
-    glClearColor(1.0, 1.0, 1.0, 0);
-    glColor3f(1,0,1);
-    glPointSize(7.0);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+// Main function
+int main(int argc, char *argv[]) {
+    // Prompt user to enter coordinates
+    cout << "Enter the coordinates of the starting point: \n";
+    cout << "Enter the value of x1: ";
+    cin >> x1_coor;
+    cout << "Enter the value of y1: ";
+    cin >> y1_coor;
+
+    cout << "Enter the coordinates of the end point: \n";
+    cout << "Enter the value of x2: ";
+    cin >> x2_coor;
+    cout << "Enter the value of y2: ";
+    cin >> y2_coor;
+
+    // Initialize GLUT and set display mode
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("DDA Line drawing algorithm");
+
+    // Set OpenGL properties
+    glClearColor(1, 1, 1, 0.0);
+    glColor3f(1, 0, 0);
+    glPointSize(5.0);
     gluOrtho2D(0, 100, 0, 100);
-}
 
-int main(int C, char *V[]){
-    glutInit(&C,V);
-    glutInitDisplayMode(GLUT_RGB  | GLUT_SINGLE);
-    glutInitWindowSize(600,600);
-    glutInitWindowPosition(0,0);
+    // Set display callback function
+    glutDisplayFunc(displayCB);
 
-    glutCreateWindow("DDA Line Drawing");
-    Initial();
-    glutDisplayFunc(Draw);
+    // Enter GLUT event processing loop
     glutMainLoop();
+
     return 0;
 }

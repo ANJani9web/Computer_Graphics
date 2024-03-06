@@ -1,209 +1,175 @@
-// // // draw a line joining two end points given by the user by implementing mid point algorithm
-// // do not declare the points as global variables and do not use built in functions for drawing the line
-
-// // use the following algorithm
-// // 1. input the two end points of the line
-// // 2. calculate dx and dy
-// // 3. calculate steps
-// // 4. calculate xincrement and yincrement
-// // 5. put pixel (x,y)
-// // 6. repeat steps 5 and 6 until x=x2 and y=y2
-// // 7. end
-
-// #include <iostream>
-// #include <GL/glut.h>
-
-// using namespace std;
-
-// // Structure to hold a point (x, y)
-// struct Point {
-//     int x;
-//     int y;
-// };
-
-// // Function to draw a line using Midpoint algorithm
-// void drawLine(Point p1, Point p2) {
-//     int dx = p2.x - p1.x;
-//     int dy = p2.y - p1.y;
-//     int d = 2 * dy - dx;
-//     int incrE = 2 * dy;
-//     int incrNE = 2 * (dy - dx);
-//     int x = p1.x;
-//     int y = p1.y;
-
-//     glBegin(GL_POINTS);
-//     glVertex2i(x, y);
-//     while (x < p2.x) {
-//         if (d <= 0) {
-//             d += incrE;
-//             x++;
-//         } else {
-//             d += incrNE;
-//             x++;
-//             y++;
-//         }
-//         glVertex2i(x, y);
-//     }
-//     glEnd();
-//     glFlush();
-// }
-
-// // Function to handle drawing
-// void display() {
-//     Point p1, p2;
-
-//     // Input two endpoints
-//     cout << "Enter endpoint 1 (x1, y1): ";
-//     cin >> p1.x >> p1.y;
-
-//     cout << "Enter endpoint 2 (x2, y2): ";
-//     cin >> p2.x >> p2.y;
-
-//     // Set the color of the line to green
-//     glColor3f(0.0, 1.0, 0.0);
-
-//     // Draw the line
-//     drawLine(p1, p2);
-// }
-
-// int main(int argc, char** argv) {
-//     // Initialize GLUT
-//     glutInit(&argc, argv);
-
-//     // Set display mode
-//     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-
-//     // Set window size and position
-//     glutInitWindowSize(500, 500);
-//     glutInitWindowPosition(100, 100);
-
-//     // Create window with a title
-//     glutCreateWindow("Midpoint Line Drawing");
-
-//     // Set the display function
-//     glutDisplayFunc(display);
-
-//     // Set the color for clearing the window
-//     glClearColor(1.0, 1.0, 1.0, 0.0);
-
-//     // Set the viewport
-//     glMatrixMode(GL_PROJECTION);
-//     glLoadIdentity();
-//     gluOrtho2D(0, 500, 0, 500);
-
-//     // Start the main loop
-//     glutMainLoop();
-
-//     return 0;
-// }
-
-//Midpoint algorithm for line drawing 
-
-// if slope is less than 1 then 
-// we declare a variable d i.e., is dy - (dx/2)
-// if d < 0 , d ==> d + dy and x++,y
-// else d ==> d + dy - dx, x++,y++
-
-
-
-// for slope grater than 1 then
-// d will be dx - (dy/2)
-// if d < 0, d ==> d + dx and y++, x
-// else d ==> d + dx - dy, x++, y++
-
-
-
 #include <GL/glut.h>
-#include<GL/glu.h>
 #include<bits/stdc++.h>
+
 using namespace std;
 
-void MidPoint(int x1,int y1,int x2,int y2){
+// Global variables to store coordinates
+float x1_coor, y1_coor, x2_coor, y2_coor;
 
-    //slope
-    float m = (float)(y2 - y1)/(float)(x2 - x1);
+// Vectors to store calculated coordinates
+vector<float> x_coor, y_coor;
 
-    int dx = x2-x1, dy = y2-y1;
+// Function to handle lines with slope greater than one
+void slope_greater_than_one(int steps) {
+    x_coor.push_back(x1_coor);
+    y_coor.push_back(y1_coor);
 
-    if(abs(m) <= 1){
-        float d = (float)dy - (float)dx/(float)2;
-        float X = x1,Y = y1;
-        glColor3f(0.0f, 1.0f, 0.0f); // green color
-        glBegin(GL_POINTS);
-            glVertex2f(round(X),round(Y));
-        glEnd();
-        for(int i=0;i<abs(dx);i++){
-            if(d < 0){
-                d = d + dy;
-                X = X + 1;
-                Y = Y;
-                glColor3f(0.0f, 1.0f, 0.0f); // green color
-                glBegin(GL_POINTS);
-                    glVertex2f(round(X),round(Y));
-                glEnd();
-            }else{
-                d = d + dy - dx;
-                X = X + 1;
-                Y = Y + 1;
-                glColor3f(0.0f, 1.0f, 0.0f); // green color
-                glBegin(GL_POINTS);
-                    glVertex2f(round(X),round(Y));
-                glEnd();
-            }
+    int dy = y2_coor - y1_coor;
+    int dx = x2_coor - x1_coor;
+    
+    int decision_parameter = dx - dy/2;
+    
+    int curr_x = x1_coor;
+    int curr_y = y1_coor;
+
+    while(curr_y!=y2_coor){
+        curr_y++;
+        if(decision_parameter<0){
+            decision_parameter += dx;
         }
-
-    }else{
-        float d = (float)dx - (float)dy/(float)2;
-        float X = x1,Y = y1;
-        glColor3f(0.0f, 1.0f, 0.0f); // green color
-        glBegin(GL_POINTS);
-            glVertex2f(round(X),round(Y));
-        glEnd();
-        for(int i=0;i<abs(dy);i++){
-            if(d < 0){
-                d = d + dx;
-                Y = Y + 1;
-                X = X;
-                glColor3f(0.0f, 1.0f, 0.0f); // green color
-                glBegin(GL_POINTS);
-                    glVertex2f(round(X),round(Y));
-                glEnd();
-            }else{
-                d = d + dx - dy;
-                X = X + 1;
-                Y = Y + 1;
-                glColor3f(0.0f, 1.0f, 0.0f); // green color
-                glBegin(GL_POINTS);
-                    glVertex2f(round(X),round(Y));
-                glEnd();
-            }
+        else {
+            decision_parameter += (dx-dy);
+            curr_x++;
         }
-
+        x_coor.push_back(curr_x);
+        y_coor.push_back(curr_y);
     }
+
+    for(int i=0;i<x_coor.size();i++){
+        glBegin(GL_POINTS);
+            glVertex2f(x_coor[i],y_coor[i]);
+        glEnd();
+    }
+}
+
+// Function to handle lines with slope less than one
+void slope_less_than_one() {
+    x_coor.push_back(x1_coor);
+    y_coor.push_back(y1_coor);
+
+    int dy = y2_coor - y1_coor;
+    int dx = x2_coor - x1_coor;
+    
+    int decision_parameter = dy - dx/2;
+    
+    int curr_x = x1_coor;
+    int curr_y = y1_coor;
+
+    while(curr_x!=x2_coor){
+        curr_x++;
+        if(decision_parameter<0){
+            decision_parameter += dy;
+        }
+        else {
+            decision_parameter += (dy-dx);
+            curr_y++;
+        }
+        x_coor.push_back(curr_x);
+        y_coor.push_back(curr_y);
+    }
+
+    for(int i=0;i<x_coor.size();i++){
+        glBegin(GL_POINTS);
+            glVertex2f(x_coor[i],y_coor[i]);
+        glEnd();
+    }
+}
+
+// Function to handle lines with slope equal to one
+void slope_equal_to_one(int steps) {
+    x_coor.push_back(x1_coor);
+    y_coor.push_back(y1_coor);
+
+    int dy = y2_coor - y1_coor;
+    int dx = x2_coor - x1_coor;
+    
+    int decision_parameter = 2*dy - dx;
+    
+    int curr_x = x1_coor;
+    int curr_y = y1_coor;
+
+    while(curr_x!=x2_coor){
+        curr_x++;
+        if(decision_parameter<0){
+            decision_parameter += 2*dy;
+        }
+        else {
+            decision_parameter += 2*(dy-dx);
+            curr_y++;
+        }
+        x_coor.push_back(curr_x);
+        y_coor.push_back(curr_y);
+    }
+
+    for(int i=0;i<x_coor.size();i++){
+        glBegin(GL_POINTS);
+            glVertex2f(x_coor[i],y_coor[i]);
+        glEnd();
+    }
+}
+
+// Display callback function
+void displayCB() {
+    // Ensure the starting point is on the left
+    if (x1_coor > x2_coor) {
+        swap(x1_coor, x2_coor);
+        swap(y1_coor, y2_coor);
+    }
+
+    // Calculate the differences in x and y coordinates
+    int dx = x2_coor - x1_coor;
+    int dy = y2_coor - y1_coor;
+
+    // Determine the number of steps
+    int steps = max(abs(dx), abs(dy));
+
+    // Determine the slope type and call the appropriate function
+    if (abs(dy) > abs(dx)) {
+        // Slope greater than one
+        slope_greater_than_one(steps);
+    } else if (abs(dy) < abs(dx)) {
+        // Slope less than one
+        slope_less_than_one();
+    } else {
+        // Slope equal to one
+        slope_equal_to_one(steps);
+    }
+
+    // Flush the drawing commands
     glFlush();
-
 }
 
-void Draw() {
-    float x1,y1,x2,y2; 
-    x1=30;
-    y1=40;
-    x2=70;
-    y2=70;
-    MidPoint(x1,y1,x2,y2);
-}
+// Main function
+int main(int argc, char *argv[]) {
+    // Prompt user to enter coordinates
+    cout << "Enter the coordinates of the starting point: \n";
+    cout << "Enter the value of x1: ";
+    cin >> x1_coor;
+    cout << "Enter the value of y1: ";
+    cin >> y1_coor;
 
-int main(int argc, char** argv){
+    cout << "Enter the coordinates of the end point: \n";
+    cout << "Enter the value of x2: ";
+    cin >> x2_coor;
+    cout << "Enter the value of y2: ";
+    cin >> y2_coor;
+
+    // Initialize GLUT and set display mode
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_RGB);
     glutInitWindowSize(600, 600);
-    glutCreateWindow("MidPoint Line Drawing Algorithm");
+    glutCreateWindow("Mid Point Line drawing algorithm");
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black background
-    gluOrtho2D(0, 100, 0, 100);     // 2D Orthographic projection
+    // Set OpenGL properties
+    glClearColor(1, 1, 1, 0.0);
+    glColor3f(1, 0, 0);
+    glPointSize(5.0);
+    gluOrtho2D(0, 100, 0, 100);
 
-    glutDisplayFunc(Draw);
+    // Set display callback function
+    glutDisplayFunc(displayCB);
 
+    // Enter GLUT event processing loop
     glutMainLoop();
 
     return 0;
