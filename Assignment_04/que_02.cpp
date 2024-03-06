@@ -1,88 +1,104 @@
 #include <GL/glut.h>
-#include<GL/glu.h>
 #include<bits/stdc++.h>
 using namespace std;
 
-// Write a program using glut library to draw the
-// circle by implementing the following
-// techniques:
-// 1. Bresenham's algorithm
-// code to run in terminal
-// g++ que_01.cpp -o que_01 -lglut -lGLU -lGL
+// Declare variables to store circle parameters
+float x_cen, y_cen, radius;
+vector<float> x_coor, y_coor;
 
-void Draw() 
-{
-    cout<<"Enter the radius\n";
-    int radius;
-    cin>>radius;
+// Display callback function to draw the circle
+void displayCB() {
+    // Initialize starting components and decision parameter
+    float x_comp = 0, y_comp = radius;
+    int decision_parameter = 1 - radius;
 
-    cout<<"Enter the coordinates of the center\n";
-    int x_center,y_center;
-    cin>>x_center>>y_center;
+    // Add initial points to vectors
+    x_coor.push_back(0);
+    y_coor.push_back(radius);
+
+    x_coor.push_back(0);
+    y_coor.push_back(-radius);
+
+    x_coor.push_back(-radius);
+    y_coor.push_back(0);
+
+    x_coor.push_back(radius);
+    y_coor.push_back(0);
     
-    glClear(GL_COLOR_BUFFER_BIT); 
-    vector<pair<int,int>> vp;
+    // Mid-point circle algorithm
+    while (x_comp != y_comp) {
+        if (decision_parameter < 0) {
+            decision_parameter += 2 * x_comp + 3;
+            x_comp++;
+        } else {
+            decision_parameter += 2 * (x_comp - y_comp) + 5;
+            y_comp--;
+            x_comp++;
+        }
+        // Add points based on symmetry
+        x_coor.push_back(x_comp);
+        y_coor.push_back(y_comp);
 
-    int x_c= 0;
-    int y_c = radius;
+        x_coor.push_back(y_comp);
+        y_coor.push_back(x_comp);
 
-    int decision_par = 3 - 2*radius;
+        x_coor.push_back(-y_comp);
+        y_coor.push_back(x_comp);
+        
+        x_coor.push_back(-x_comp);
+        y_coor.push_back(y_comp);
 
-    while(x_c<=y_c){
-         
-         vp.push_back({x_c,y_c});
-         if(decision_par<0){
-            decision_par = decision_par + 4*x_c + 6;
-         }
-         else{
-            decision_par = decision_par + 4*x_c - 4*y_c;
-            y_c--;
-         }
-         x_c++;
+        x_coor.push_back(-x_comp);
+        y_coor.push_back(-y_comp);
+
+        x_coor.push_back(-y_comp);
+        y_coor.push_back(-x_comp);
+
+        x_coor.push_back(y_comp);
+        y_coor.push_back(-x_comp);
+
+        x_coor.push_back(x_comp);
+        y_coor.push_back(-y_comp);
     }
 
-    glBegin(GL_POINTS);
-    
-    for(int i=0;i<vp.size();i++){
-        int x = vp[i].first;
-        int y = vp[i].second;
-
-        glVertex2i(x+x_center,y+y_center);
-        glVertex2i(-x+x_center,y+y_center);
-        glVertex2i(-x+x_center,-y+y_center);
-        glVertex2i(x+x_center,-y+y_center);
-
-        glVertex2i(y+x_center,x+y_center);
-        glVertex2i(-y+x_center,x+y_center);
-        glVertex2i(-y+x_center,-x+y_center);
-        glVertex2i(y+x_center,-x+y_center);
-
+    // Plot the calculated points
+    for (int i = 0; i < x_coor.size(); i++) {
+        glBegin(GL_POINTS);
+        glVertex2f(x_cen + x_coor[i], y_cen + y_coor[i]);
+        glEnd();
     }
-
-    glEnd();
-
-   glFlush();
-
-
+    
+    glFlush();
 }
 
-void Initial() {
-    glClearColor(1.0, 1.0, 1.0, 0);
-    glColor3f(0,0,0);
-    glPointSize(2.0);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0, 150, 0, 150);
-}
+int main(int argc, char** argv) {
+    // Prompt user to enter circle parameters
+    cout << "Enter the coordinates of the Center: \n";
+    cout << "Enter the x-coordinate: ";
+    cin >> x_cen;
+    cout << "Enter the y-coordinate: ";
+    cin >> y_cen;
 
-int main(int C, char *V[]){
-    glutInit(&C,V);
-    glutInitDisplayMode(GLUT_RGB  | GLUT_SINGLE);
-    glutInitWindowSize(600,600);
-    glutInitWindowPosition(0,0);
-    glutCreateWindow("Bresenham's algorithm");
-    Initial();
-    glutDisplayFunc(Draw);
+    cout << "Enter the radius of the circle: ";
+    cin >> radius;
+
+    // Initialize OpenGL and create window
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("Mid-Point Circle Drawing Algorithm");
+    
+    // Set OpenGL properties
+    glClearColor(1, 1, 1, 0.0);
+    glColor3f(1, 0, 0);
+    glPointSize(3.0);
+    gluOrtho2D(0, 100, 0, 100);
+
+    // Register the display callback function
+    glutDisplayFunc(displayCB);
+
+    // Enter the GLUT event processing loop
     glutMainLoop();
+
     return 0;
 }

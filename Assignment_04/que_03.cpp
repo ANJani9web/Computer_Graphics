@@ -1,74 +1,85 @@
 #include <GL/glut.h>
-#include <cmath>
 #include<bits/stdc++.h>
 using namespace std;
-// Function to draw a circle using DDA algorithm
-// float h, k;
-void drawCircle(float radius) {
-    float x, y;
-    int h,k;
-    cout<<"Enter x_coor :"<<endl;
-    cin>>h;
 
-    cout<<"Enter y_coor :"<<endl;
-    cin>>k;
+// Declare variables to store circle parameters
+float x_cen, y_cen, radius;
+vector<float> x_coor, y_coor;
 
-    float step = 1.00; // Step size for DDA algorithm
+// Display callback function to draw the circle using DDA algorithm
+void displayCB() {
+    // Iterate through angles to generate circle points
+    for (float angle = 0.0; angle <= 0.80; angle = angle + 0.01) {
+        // Calculate components using trigonometric functions
+        float x_comp = radius * cos(angle);
+        float y_comp = radius * sin(angle);
 
-    glBegin(GL_POINTS);
+        // Add points based on symmetry
+        x_coor.push_back(x_comp);
+        y_coor.push_back(y_comp);
 
-    for (float theta = 0; theta <= 45; theta += step) {
-       
+        x_coor.push_back(y_comp);
+        y_coor.push_back(x_comp);
 
-        x = radius * cos(theta);
-        y = radius * sin(theta);
+        x_coor.push_back(-y_comp);
+        y_coor.push_back(x_comp);
+        
+        x_coor.push_back(-x_comp);
+        y_coor.push_back(y_comp);
 
-        // Plot the points in each octant
-        glVertex2i(round(h+x), round(y+k));
-        glVertex2i(round(-x+h), round(y+k));
-        glVertex2i(round(x+h), round(-y+k));
-        glVertex2i(round(-x+h), round(-y+k));
-        glVertex2i(round(y+h), round(x+k));
-        glVertex2i(round(-y+h), round(x+k));
-        glVertex2i(round(y+h), round(-x+k));
-        glVertex2i(round(-y+h), round(-x+k));
+        x_coor.push_back(-x_comp);
+        y_coor.push_back(-y_comp);
+
+        x_coor.push_back(-y_comp);
+        y_coor.push_back(-x_comp);
+
+        x_coor.push_back(y_comp);
+        y_coor.push_back(-x_comp);
+
+        x_coor.push_back(x_comp);
+        y_coor.push_back(-y_comp);
     }
 
-    glEnd();
+    // Plot the calculated points
+    for (int i = 0; i < x_coor.size(); i++) {
+         glBegin(GL_POINTS);
+             glVertex2f(x_cen + x_coor[i], y_cen + y_coor[i]);
+         glEnd();
+    }
+    
+    // Flush the drawing commands
+    glFlush();
 }
 
-// Function to set up the OpenGL environment
-void init() {
-    glClearColor(1.0, 1.0, 1.0, 0);
-    glColor3f(0,0,0);
-    glPointSize(2.0);
-    gluOrtho2D(0.0,150.0,0.0,150.0); // Set the clipping window
-}
-
-// Function to handle all drawings
-void display() {
-    glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
-
-    // Draw a circle with radius 50 using DDA algorithm
-    drawCircle(30);
-
-    glFlush(); // Flush the buffer
-}
-
+// Main function
 int main(int argc, char** argv) {
-    // int h,k;
-    // cin>>h>>k;
+    // Prompt user to enter circle parameters
+    cout << "Enter the coordinates of the Center: \n";
+    cout << "Enter the x-coordinate: ";
+    cin >> x_cen;
+    cout << "Enter the y-coordinate: ";
+    cin >> y_cen;
+
+    cout << "Enter the radius of the circle: ";
+    cin >> radius;
+
+    // Initialize OpenGL and create window
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(600, 600);
-    glutInitWindowPosition(0, 0);
     glutCreateWindow("DDA Circle Drawing Algorithm");
+    
+    // Set OpenGL properties
+    glClearColor(1, 1, 1, 0.0);
+    glColor3f(1, 0, 0);
+    glPointSize(3.0);
+    gluOrtho2D(0, 100, 0, 100);
 
-    init(); // Initialize the OpenGL environment
+    // Register the display callback function
+    glutDisplayFunc(displayCB);
 
-    glutDisplayFunc(display); // Register the display function
-
-    glutMainLoop(); // Enter the GLUT event processing loop
+    // Enter the GLUT event processing loop
+    glutMainLoop();
 
     return 0;
 }
