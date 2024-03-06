@@ -1,262 +1,195 @@
-#include<stdlib.h>
-#include<stdio.h>
-#include <GL/gl.h>
 #include <GL/glut.h>
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <cmath>
+
 using namespace std;
-// float x1, x2, y1, y2;
-struct point{
-    int x,y;
-    point(int a=0,int b=0){
-        x=a,y=b;
-    }
-};
-struct Color {
-	GLfloat r;
-	GLfloat g;
-	GLfloat b;
+
+// Structure to represent a point
+struct Dot {
+    int x, y;
+    Dot(int a = 0, int b = 0) : x(a), y(b) {}
 };
 
-Color getPixelColor(GLint x, GLint y) {
-	Color color;
-	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &color);
-	return color;
+// Structure to represent a color in RGB
+struct Shade {
+    GLfloat red;
+    GLfloat green;
+    GLfloat blue;
+};
+
+// Vector to store points for drawing
+vector<Dot> dots;
+
+// Function to get the color of a pixel at given coordinates
+Shade acquirePixelShade(GLint x, GLint y) {
+    Shade shade;
+    glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &shade);
+    return shade;
 }
 
-void setPixelColor(GLint x, GLint y, Color color) {
-	glColor3f(color.r, color.g, color.b);
-	glBegin(GL_POINTS);
-	glVertex2i(x, y);
-	glEnd();
-	glFlush();
+// Function to set the color of a pixel at given coordinates
+void adjustPixelShade(GLint x, GLint y, Shade shade) {
+    glColor3f(shade.red, shade.green, shade.blue);
+    glBegin(GL_POINTS);
+    glVertex2i(x, y);
+    glEnd();
+    glFlush();
 }
-bool checkrightdown(GLint x, GLint y ,Color oldColor){
-    Color color1;
-	color1 = getPixelColor(x+1, y);
-    Color color2;
-	color2 = getPixelColor(x, y-1);
-    int ct=0;
-    if(color1.r == oldColor.r && color1.g == oldColor.g && color1.b == oldColor.b){
-        ct++;
-    }
-    if(color2.r == oldColor.r && color2.g == oldColor.g && color2.b == oldColor.b){
-        ct++;
-    }
-    return ct==2;
-    
-}
-bool checkrightup(GLint x, GLint y ,Color oldColor){
-    Color color1;
-	color1 = getPixelColor(x+1, y);
-    Color color2;
-	color2 = getPixelColor(x, y+1);
-    int ct=0;
-    if(color1.r == oldColor.r && color1.g == oldColor.g && color1.b == oldColor.b){
-        ct++;
-    }
-    if(color2.r == oldColor.r && color2.g == oldColor.g && color2.b == oldColor.b){
-        ct++;
-    }
-    return ct==2;
-    
-}
-bool checkleftup(GLint x, GLint y ,Color oldColor){
-    Color color1;
-	color1 = getPixelColor(x, y+1);
-    Color color2;
-	color2 = getPixelColor(x-1, y);
-    int ct=0;
-    if(color1.r == oldColor.r && color1.g == oldColor.g && color1.b == oldColor.b){
-        ct++;
-    }
-    if(color2.r == oldColor.r && color2.g == oldColor.g && color2.b == oldColor.b){
-        ct++;
-    }
-    return ct==2;
-    
-}
-bool checkleftdown(GLint x, GLint y ,Color oldColor){
-    Color color1;
-	color1 = getPixelColor(x-1, y);
-    Color color2;
-	color2 = getPixelColor(x, y-1);
-    int ct=0;
-    if(color1.r == oldColor.r && color1.g == oldColor.g && color1.b == oldColor.b){
-        ct++;
-    }
-    if(color2.r == oldColor.r && color2.g == oldColor.g && color2.b == oldColor.b){
-        ct++;
-    }
-    return ct==2;
-    
-}
-void floodFill(GLint x, GLint y, Color oldColor, Color newColor) {
-	Color color;
-	color = getPixelColor(x, y);
-    
-	if(color.r != oldColor.r && color.g != oldColor.g && color.b != oldColor.b)
-	{ 
 
-		setPixelColor(x, y, newColor);
-
-		floodFill(x+1, y, oldColor, newColor);
-		floodFill(x, y+1, oldColor, newColor);
-		floodFill(x-1, y, oldColor, newColor);
-		floodFill(x, y-1, oldColor, newColor);
-        // if(!checkrightdown(x,y,oldColor)){
-        // floodFill(x+1, y-1, oldColor, newColor);
-        // }
-        // if(!checkrightup(x,y,oldColor)){
-        // floodFill(x+1, y+1, oldColor, newColor);
-        // }
-        
-	    // if(!checkleftup(x,y,oldColor)){
-		// floodFill(x-1, y+1, oldColor, newColor);
-        // }
-        // if(!checkleftdown(x,y,oldColor)){
-		// floodFill(x-1, y-1, oldColor, newColor);
-        // }
-	}
-	return;
+// Function to check if a neighboring pixel has the same color
+bool confirmDirection(GLint x, GLint y, Shade oldShade, int dx, int dy) {
+    Shade shade1 = acquirePixelShade(x + dx, y);
+    Shade shade2 = acquirePixelShade(x, y + dy);
+    return (shade1.red == oldShade.red && shade1.green == oldShade.green && shade1.blue == oldShade.blue) &&
+           (shade2.red == oldShade.red && shade2.green == oldShade.green && shade2.blue == oldShade.blue);
 }
-vector<point> points;
 
-void Breshens(int x1,int y1,int r)
-{
-    
-    int X = 0, Y = r;
-    int d = 3 - 2*r;
-    while(X <= Y)
-    {
-        points.push_back(point(X,Y));
-        points.push_back(point(Y,X));
-        points.push_back(point(-1*X,Y));
-        points.push_back(point(-1*Y,X));
-        points.push_back(point(X,-1*Y));
-        points.push_back(point(Y,-1*X));
-        points.push_back(point(-1*X,-1*Y));
-        points.push_back(point(-1*Y,-1*X));
+// Flood fill algorithm to fill a bounded area with a new color
+void performFloodFill(GLint x, GLint y, Shade oldShade, Shade newShade) {
+    Shade shade = acquirePixelShade(x, y);
 
-        if(d < 0)
-        {
-            d = d + 4*X + 6;
-            X++;
-        }
-        else
-        {
-            d = d + 4*(X-Y) + 10;
-            X++;
+    // If the color at the given coordinates is different from the old color, fill it with the new color
+    if (shade.red != oldShade.red && shade.green != oldShade.green && shade.blue != oldShade.blue) {
+        adjustPixelShade(x, y, newShade);
+
+        // Recursively fill adjacent pixels with the new color
+        performFloodFill(x + 1, y, oldShade, newShade);
+        performFloodFill(x, y + 1, oldShade, newShade);
+        performFloodFill(x - 1, y, oldShade, newShade);
+        performFloodFill(x, y - 1, oldShade, newShade);
+
+        // Check diagonal pixels and fill them if they have the old color
+        if (!confirmDirection(x, y, oldShade, 1, -1)) performFloodFill(x + 1, y - 1, oldShade, newShade);
+        if (!confirmDirection(x, y, oldShade, 1, 1)) performFloodFill(x + 1, y + 1, oldShade, newShade);
+        if (!confirmDirection(x, y, oldShade, -1, 1)) performFloodFill(x - 1, y + 1, oldShade, newShade);
+        if (!confirmDirection(x, y, oldShade, -1, -1)) performFloodFill(x - 1, y - 1, oldShade, newShade);
+    }
+}
+
+// Function to draw a circle using Bresenham's algorithm
+void drawCircle(int x, int y, int radius) {
+    int X = 0, Y = radius;
+    int d = 3 - 2 * radius;
+    while (X <= Y) {
+        dots.push_back(Dot(X, Y));
+        dots.push_back(Dot(Y, X));
+        dots.push_back(Dot(-X, Y));
+        dots.push_back(Dot(-Y, X));
+        dots.push_back(Dot(X, -Y));
+        dots.push_back(Dot(Y, -X));
+        dots.push_back(Dot(-X, -Y));
+        dots.push_back(Dot(-Y, -X));
+
+        if (d < 0) {
+            d = d + 4 * X + 6;
+        } else {
+            d = d + 4 * (X - Y) + 10;
             Y--;
         }
+        X++;
     }
-    
-    
+
     glBegin(GL_POINTS);
-    for(auto i : points){
-      
-        glVertex2f(round(i.x + x1),round(i.y + y1));
+    for (auto dot : dots) {
+        glVertex2f(round(dot.x + x), round(dot.y + y));
     }
-    glEnd();
- 
-
-}
-
-
-void draw_line(int x1, int x2, int y1, int y2) {
-	float dx, dy, i, e;
-	float incx, incy, inc1, inc2;
-	float x,y;
-    glBegin(GL_POINTS);
-	dx = x2-x1;
-	dy = y2-y1;
-
-	if (dx < 0) dx = -dx;
-	if (dy < 0) dy = -dy;
-	incx = 1;
-	if (x2 < x1) incx = -1;
-	incy = 1;
-	if (y2 < y1) incy = -1;
-	x = x1; y = y1;
-	if (dx > dy) {
-		 glVertex2f(round(x), round(y));  
-		e = 2 * dy-dx;
-		inc1 = 2*(dy-dx);
-		inc2 = 2*dy;
-		for (i=0; i<dx; i++) {
-			if (e >= 0) {
-				y += incy;
-				e += inc1;
-			}
-			else
-				e += inc2;
-			x += incx;
-			 glVertex2f(round(x), round(y));  
-		}
-
-	} else {
-		 glVertex2f(round(x), round(y));  
-		e = 2*dx-dy;
-		inc1 = 2*(dx-dy);
-		inc2 = 2*dx;
-		for (i=0; i<dy; i++) {
-			if (e >= 0) {
-				x += incx;
-				e += inc1;
-			}
-			else
-				e += inc2;
-			y += incy;
-			 glVertex2f(round(x), round(y));  
-		}
-	}
     glEnd();
 }
 
-void myDisplay() {
+// Function to draw a line using Bresenham's algorithm
+void drawLine(int x1, int x2, int y1, int y2) {
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float incx, incy;
+
+    if (dx < 0) dx = -dx;
+    if (dy < 0) dy = -dy;
+    incx = (x2 < x1) ? -1 : 1;
+    incy = (y2 < y1) ? -1 : 1;
+
+    float x = x1, y = y1;
+    glBegin(GL_POINTS);
+
+    if (dx > dy) {
+        float e = 2 * dy - dx;
+        for (int i = 0; i < dx; i++) {
+            dots.push_back(Dot(round(x), round(y)));
+            if (e >= 0) {
+                y += incy;
+                e += 2 * (dy - dx);
+            } else {
+                e += 2 * dy;
+            }
+            x += incx;
+        }
+    } else {
+        float e = 2 * dx - dy;
+        for (int i = 0; i < dy; i++) {
+            dots.push_back(Dot(round(x), round(y)));
+            if (e >= 0) {
+                x += incx;
+                e += 2 * (dx - dy);
+            } else {
+                e += 2 * dx;
+            }
+            y += incy;
+        }
+    }
+    glEnd();
+}
+
+// Function to handle the display
+void displayCB() {
     glClear(GL_COLOR_BUFFER_BIT);
-    Breshens(200,230,30);
-    Breshens(400,230,30);
-	draw_line(100,500,300,300);
-    draw_line(100,170,230,230);
-    draw_line(230,370,230,230);
-    draw_line(430,500,230,230);
-    draw_line(500,500,230,300);
-    draw_line(100,100,230,300);
-    draw_line(200,230,300,350);
-    draw_line(230,370,350,350);
-    draw_line(370,400,350,300);
-    draw_line(400,200,300,300);
-   
-   
-	Color newColor = {1.0f, 0.0f, 0.0f};
-	Color oldColor = {1.0f, 1.0f, 1.0f};
+    drawCircle(210, 240, 30);
+    drawCircle(410, 240, 30);
+    drawLine(110, 510, 310, 310);
+    drawLine(110, 180, 240, 240);
+    drawLine(240, 380, 240, 240);
+    drawLine(440, 510, 240, 240);
+    drawLine(510, 510, 240, 310);
+    drawLine(110, 110, 240, 310);
+    drawLine(210, 240, 310, 360);
+    drawLine(240, 380, 360, 360);
+    drawLine(380, 410, 360, 310);
+    drawLine(410, 210, 310, 310);
 
-	floodFill(300, 270, oldColor, newColor);
-    Color newColor1={0.0f, 1.0f, 0.0f};
-    floodFill(200, 230, oldColor, newColor1);
-    floodFill(400, 230, oldColor, newColor1);
-    Color newColor2={1.0f, 1.0f, 1.0f};
-    floodFill(250, 325, oldColor, newColor2);
-	glFlush();
+    glBegin(GL_POINTS);
+    for (int i = 0; i < dots.size(); i++) {
+        glVertex2f(dots[i].x, dots[i].y);
+    }
+    glEnd();
+    glFlush();
+
+    // Define colors
+    Shade newShade = {1.0f, 0.95f, 0.85f}; // Cream color
+    Shade oldShade = {1.0f, 1.0f, 1.0f};   // White color
+    performFloodFill(310, 280, oldShade, newShade);
+
+    Shade newShade1 = {0.0f, 1.0f, 0.0f};  // Green color
+    performFloodFill(210, 240, oldShade, newShade1);
+    performFloodFill(410, 240, oldShade, newShade1);
+
+    Shade newShade2 = {0.0f, 0.0f, 0.8f};   // Dark blue color
+    performFloodFill(260, 335, oldShade, newShade2);
+
+    glFlush();
 }
 
-void myInit (void) {
-  glClearColor(0.0, 0.0, 0.0, 0.0);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0.0, 600.0, 0.0, 600.0);
-}
+// Main function
+int main(int argc, char **argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("Drawing the Car");
 
-int main(int argc, char ** argv) {
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0, 600.0, 0.0, 600.0);
 
-
-
-  glutInit( & argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-  glutInitWindowSize(600, 600);
-//   glutInitWindowPosition(100, 150);
-  glutCreateWindow("");
-  myInit ();
-  glutDisplayFunc(myDisplay);
-  glutMainLoop();
+    glutDisplayFunc(displayCB);
+    glutMainLoop();
+    return 0;
 }
