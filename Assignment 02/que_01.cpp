@@ -8,7 +8,7 @@ int x_mov, y_mov; // Variables to store the movement in x-direction and y-direct
 
 // Display callback function
 void displayCB()
-{
+{ 
     glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
 
     // Draw a colored polygon
